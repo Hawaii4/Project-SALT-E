@@ -1,0 +1,15 @@
+imports
+#######
+1. Record audio with mics
+-> (recording code)
+-> else n sets of 4 recordings to be used as demo
+#######
+2. Process audio
+.1 if/when "salt" is heard in at least one of 4 audio tracks
+.2 c-c -> delta t
+.3 alg using delta t -> X_s
+#######
+3. drive to X_s
+.1 set path (~Motors_gotogoal)
+-> avoid obstacles in front (~Motors_evade_us + US)
+-> avoid falling off table (~Motors_evade_ir + IR)
