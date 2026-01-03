@@ -1,0 +1,73 @@
+import pyaudio
+import wave
+import time
+import subprocess
+import os
+from pynput import keyboard
+
+FORMAT = pyaudio.paInt16
+CHANNELS = 1
+RATE = 48000  # Recording at 16kHz directly (whisper.cpp native rate)
+CHUNK = 1024
+OUTPUT_FILENAME = "rec.wav"
+RECORD_SECONDS = 10
+WHISPER_PATH = "/home/liamj/whisper.cpp/build/bin/whisper-cli"
+MODEL_PATH = "/home/liamj/whisper.cpp/models/ggml-tiny.en.bin"
+
+print("Recording in...")
+for _ in range(5, 0, -1):
+    print(_)
+    time.sleep(1)
+print("Recording")
+
+audio = pyaudio.PyAudio()
+stream = audio.open(format=FORMAT, channels=CHANNELS,
+                    rate=RATE, input=True,
+                    frames_per_buffer=CHUNK,
+                    input_device_index=1)
+
+frames = []
+
+# Record until second space press
+for i in range(0, int(RATE/CHUNK*RECORD_SECONDS)):
+    data = stream.read(CHUNK)
+    frames.append(data)
+
+print("Finished recording")
+
+stream.stop_stream()
+stream.close()
+audio.terminate()
+
+# Save the recording
+waveFile = wave.open(OUTPUT_FILENAME, "wb")
+waveFile.setnchannels(CHANNELS)
+waveFile.setsampwidth(audio.get_sample_size(FORMAT))
+waveFile.setframerate(RATE)
+waveFile.writeframes(b''.join(frames))
+waveFile.close()
+
+# Run whisper.cpp transcription
+print("Transcribing...")
+result = subprocess.run(
+    [WHISPER_PATH, "-m", MODEL_PATH, "-f", OUTPUT_FILENAME, "-nt"],
+    capture_output=True,
+    text=True
+)
+
+# Parse the output
+transcription = result.stdout.strip()
+
+'''
+# Extract just the transcribed text (remove timestamps and metadata)
+lines = transcription.split('\n')
+text_lines = [line.strip() for line in lines if line.strip() and not line.startswith('[')]
+full_text = ' '.join(text_lines)
+'''
+
+print(f"Transcription: {transcription}")
+
+if "salt" in transcription.lower():
+    print("True")
+else:
+    print("No Salt")
