@@ -1,7 +1,7 @@
 from asyncio import wait_for
 
 import RPi.GPIO as GPIO
-import time, math, random, queue, threading, sys, numpy as np, whisper, pyaudio, keyboard, wave, subprocess
+import time, math, random, queue, threading, sys, numpy as np, pyaudio, wave, subprocess
 
 # === GPIO Pin Definitions (BCM) ===
 # Motor 1
@@ -533,3 +533,4 @@ finally:
     stop_()
     GPIO.cleanup()
     print("Exiting program")
+
