@@ -523,7 +523,7 @@ try:
 
         GPIO.add_event_detect(IR_pin, GPIO.RISING, callback=IR_recieved, bouncetime=200)
         GPIO.add_event_detect(US_pin, GPIO.RISING, callback=US_received, bouncetime=200)
-        threading.Thread(target=gotogoal, args=goal, daemon=True).start()
+        threading.Thread(target=gotogoal, args=(goal,), daemon=True).start()
 
         command_loop()
     else:
@@ -533,4 +533,5 @@ finally:
     stop_()
     GPIO.cleanup()
     print("Exiting program")
+
 
